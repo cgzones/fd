@@ -559,6 +559,12 @@ impl WorkerState {
                             return WalkState::Continue;
                         }
                     }
+
+                    if let Some(context_constraint) = &config.context_constraint {
+                        if !context_constraint.matches(entry_path) {
+                            return ignore::WalkState::Continue;
+                        }
+                    }
                 }
 
                 // Filter out unwanted sizes if it is a file and we have been given size constraints.
