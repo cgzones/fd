@@ -14,6 +14,8 @@ use normpath::PathExt;
 use crate::exec::CommandSet;
 use crate::filesystem;
 #[cfg(unix)]
+use crate::filter::ContextFilter;
+#[cfg(unix)]
 use crate::filter::OwnerFilter;
 use crate::filter::SizeFilter;
 
@@ -470,6 +472,19 @@ pub struct Opts {
         long_help,
         )]
     pub owner: Option<OwnerFilter>,
+
+    /// Filter files by their SELinux context. The matching uses 'security_context' as
+    /// a regular expressions for the pattern.
+    ///
+    /// Examples:
+    /// {n}    --context unlabeled_t
+    /// {n}    --context ^user_u:object_r:.*
+    #[cfg(unix)]
+    #[arg(long, value_parser = ContextFilter::from_string, value_name = "security_context",
+    help = "Filter by SELinux context",
+    long_help,
+    )]
+    pub context: Option<ContextFilter>,
 
     /// Instead of printing the file normally, print the format string with the following placeholders replaced:
     ///   '{}': path (of the current search result)
