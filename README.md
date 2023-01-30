@@ -336,6 +336,7 @@ Options:
                                    executable (x), empty (e), socket (s), pipe (p),
                                    block-device (b), char-device (c)
   -e, --extension <ext>            Filter by file extension
+      --inum <num>                 Filter by inode number
   -S, --size <size>                Limit results based on the size of files
       --changed-within <date|dur>  Filter by file modification time (newer than)
       --changed-before <date|dur>  Filter by file modification time (older than)
