@@ -234,9 +234,11 @@ impl TestEnv {
         let output = self.run_command(path.as_ref(), args);
 
         // Check for exit status.
-        if !output.status.success() {
-            panic!("{}", format_exit_error(args, &output));
-        }
+        assert!(
+            output.status.success(),
+            "{}",
+            format_exit_error(args, &output)
+        );
 
         output
     }
@@ -256,7 +258,7 @@ impl TestEnv {
 
     /// Assert that calling *fd* with the specified arguments produces the expected output.
     pub fn assert_output(&self, args: &[&str], expected: &str) {
-        self.assert_output_subdirectory(".", args, expected)
+        self.assert_output_subdirectory(".", args, expected);
     }
 
     /// Similar to assert_output, but able to handle non-utf8 output
@@ -280,26 +282,24 @@ impl TestEnv {
         let actual = self.assert_success_and_get_normalized_output(path, args);
 
         // Compare actual output to expected output.
-        if expected != actual {
-            panic!("{}", format_output_error(args, &expected, &actual));
-        }
+        assert!(
+            expected == actual,
+            "{}",
+            format_output_error(args, &expected, &actual)
+        );
     }
 
     /// Assert that calling *fd* with the specified arguments produces the expected error,
     /// and does not succeed.
     pub fn assert_failure_with_error(&self, args: &[&str], expected: &str) {
         let status = self.assert_error_subdirectory(".", args, Some(expected));
-        if status.success() {
-            panic!("error '{expected}' did not occur.");
-        }
+        assert!(!status.success(), "error '{expected}' did not occur.");
     }
 
     /// Assert that calling *fd* with the specified arguments does not succeed.
     pub fn assert_failure(&self, args: &[&str]) {
         let status = self.assert_error_subdirectory(".", args, None);
-        if status.success() {
-            panic!("Failure did not occur as expected.");
-        }
+        assert!(!status.success(), "Failure did not occur as expected.");
     }
 
     /// Assert that calling *fd* with the specified arguments produces the expected error.
@@ -341,12 +341,11 @@ impl TestEnv {
             let actual_err = trim_lines(&String::from_utf8_lossy(&output.stderr));
 
             // Compare actual output to expected output.
-            if !actual_err.trim_start().starts_with(&expected_error) {
-                panic!(
-                    "{}",
-                    format_output_error(args, &expected_error, &actual_err)
-                );
-            }
+            assert!(
+                actual_err.trim_start().starts_with(&expected_error),
+                "{}",
+                format_output_error(args, &expected_error, &actual_err)
+            );
         }
 
         output.status

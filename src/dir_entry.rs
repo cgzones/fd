@@ -96,7 +96,7 @@ impl DirEntry {
 
     pub fn style(&self, ls_colors: &LsColors) -> Option<&Style> {
         self.style
-            .get_or_init(|| ls_colors.style_for(self).cloned())
+            .get_or_init(|| ls_colors.style_for(self).copied())
             .as_ref()
     }
 }
@@ -138,8 +138,7 @@ impl Colorable for DirEntry {
                 // Copied from LsColors::style_for_path_with_metadata().
                 path.components()
                     .last()
-                    .map(|c| c.as_os_str())
-                    .unwrap_or_else(|| path.as_os_str())
+                    .map_or_else(|| path.as_os_str(), |c| c.as_os_str())
             }
         };
         name.to_owned()

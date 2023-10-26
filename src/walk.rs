@@ -36,7 +36,7 @@ enum ReceiverMode {
     Streaming,
 }
 
-/// The Worker threads can result in a valid entry having PathBuf or an error.
+/// The Worker threads can result in a valid entry having `PathBuf` or an error.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum WorkerResult {
@@ -479,7 +479,7 @@ impl WorkerState {
                                 && path
                                     .symlink_metadata()
                                     .ok()
-                                    .map_or(false, |m| m.file_type().is_symlink()) =>
+                                    .is_some_and(|m| m.file_type().is_symlink()) =>
                         {
                             DirEntry::broken_symlink(path)
                         }
@@ -488,14 +488,14 @@ impl WorkerState {
                                 path,
                                 err: inner_err,
                             })) {
-                                Ok(_) => WalkState::Continue,
+                                Ok(()) => WalkState::Continue,
                                 Err(_) => WalkState::Quit,
                             }
                         }
                     },
                     Err(err) => {
                         return match tx.send(WorkerResult::Error(err)) {
-                            Ok(_) => WalkState::Continue,
+                            Ok(()) => WalkState::Continue,
                             Err(_) => WalkState::Quit,
                         }
                     }
