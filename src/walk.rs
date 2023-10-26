@@ -36,7 +36,7 @@ enum ReceiverMode {
     Streaming,
 }
 
-/// The Worker threads can result in a valid entry having PathBuf or an error.
+/// The Worker threads can result in a valid entry having `PathBuf` or an error.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum WorkerResult {
@@ -254,7 +254,7 @@ impl<'a, W: Write> ReceiverBuffer<'a, W> {
     fn print(&mut self, entry: &DirEntry) -> Result<(), ExitCode> {
         if let Err(e) = output::print_entry(&mut self.stdout, entry, self.config) {
             if e.kind() != ::std::io::ErrorKind::BrokenPipe {
-                print_error(format!("Could not write to output: {}", e));
+                print_error(format!("Could not write to output: {e}"));
                 return Err(ExitCode::GeneralError);
             }
         }
@@ -378,10 +378,7 @@ impl WorkerState {
                     match result {
                         Some(ignore::Error::Partial(_)) => (),
                         Some(err) => {
-                            print_error(format!(
-                                "Malformed pattern in global ignore file. {}.",
-                                err
-                            ));
+                            print_error(format!("Malformed pattern in global ignore file. {err}."));
                         }
                         None => (),
                     }
@@ -394,7 +391,7 @@ impl WorkerState {
             match result {
                 Some(ignore::Error::Partial(_)) => (),
                 Some(err) => {
-                    print_error(format!("Malformed pattern in custom ignore file. {}.", err));
+                    print_error(format!("Malformed pattern in custom ignore file. {err}."));
                 }
                 None => (),
             }
@@ -491,14 +488,14 @@ impl WorkerState {
                                 path,
                                 err: inner_err,
                             })) {
-                                Ok(_) => WalkState::Continue,
+                                Ok(()) => WalkState::Continue,
                                 Err(_) => WalkState::Quit,
                             }
                         }
                     },
                     Err(err) => {
                         return match tx.send(WorkerResult::Error(err)) {
-                            Ok(_) => WalkState::Continue,
+                            Ok(()) => WalkState::Continue,
                             Err(_) => WalkState::Quit,
                         }
                     }
