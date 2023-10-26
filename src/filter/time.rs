@@ -140,7 +140,7 @@ mod tests {
             .unwrap()
             .applies_to(&t1m_ago));
 
-        let ref_timestamp = 1707723412u64; // Mon Feb 12 07:36:52 UTC 2024
+        let ref_timestamp = 1_707_723_412_u64; // Mon Feb 12 07:36:52 UTC 2024
         let ref_time = DateTime::parse_from_rfc3339("2024-02-12T07:36:52+00:00")
             .unwrap()
             .into();
@@ -148,22 +148,16 @@ mod tests {
         let t1s_later = ref_time + Duration::from_secs(1);
         // Timestamp only supported via '@' prefix
         assert!(TimeFilter::before(&ref_time, &ref_timestamp.to_string()).is_none());
-        assert!(
-            TimeFilter::before(&ref_time, &format!("@{}", ref_timestamp))
-                .unwrap()
-                .applies_to(&t1m_ago)
-        );
-        assert!(
-            !TimeFilter::before(&ref_time, &format!("@{}", ref_timestamp))
-                .unwrap()
-                .applies_to(&t1s_later)
-        );
-        assert!(
-            !TimeFilter::after(&ref_time, &format!("@{}", ref_timestamp))
-                .unwrap()
-                .applies_to(&t1m_ago)
-        );
-        assert!(TimeFilter::after(&ref_time, &format!("@{}", ref_timestamp))
+        assert!(TimeFilter::before(&ref_time, &format!("@{ref_timestamp}"))
+            .unwrap()
+            .applies_to(&t1m_ago));
+        assert!(!TimeFilter::before(&ref_time, &format!("@{ref_timestamp}"))
+            .unwrap()
+            .applies_to(&t1s_later));
+        assert!(!TimeFilter::after(&ref_time, &format!("@{ref_timestamp}"))
+            .unwrap()
+            .applies_to(&t1m_ago));
+        assert!(TimeFilter::after(&ref_time, &format!("@{ref_timestamp}"))
             .unwrap()
             .applies_to(&t1s_later));
     }
