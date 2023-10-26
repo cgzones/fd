@@ -50,7 +50,7 @@ pub fn is_empty(entry: &dir_entry::DirEntry) -> bool {
                 false
             }
         } else if file_type.is_file() {
-            entry.metadata().map(|m| m.len() == 0).unwrap_or(false)
+            entry.metadata().is_some_and(|m| m.len() == 0)
         } else if file_type.is_symlink() {
             if let Ok(target) = entry.path().read_link() {
                 let full_target = entry
@@ -131,7 +131,7 @@ pub fn strip_current_dir(path: &Path) -> &Path {
     path.strip_prefix(".").unwrap_or(path)
 }
 
-/// Default value for the path_separator, mainly for MSYS/MSYS2, which set the MSYSTEM
+/// Default value for the `path_separator`, mainly for MSYS/MSYS2, which set the MSYSTEM
 /// environment variable, and we set fd's path separator to '/' rather than Rust's default of '\'.
 ///
 /// Returns Some to use a nonstandard path separator, or None to use rust's default on the target

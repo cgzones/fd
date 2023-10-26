@@ -15,7 +15,7 @@ impl From<ExitCode> for i32 {
     fn from(code: ExitCode) -> Self {
         match code {
             ExitCode::Success => 0,
-            ExitCode::HasResults(has_results) => !has_results as i32,
+            ExitCode::HasResults(has_results) => i32::from(!has_results),
             ExitCode::GeneralError => 1,
             ExitCode::KilledBySigint => 130,
         }
