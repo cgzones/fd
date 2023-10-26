@@ -51,6 +51,13 @@ pub fn is_empty(entry: &dir_entry::DirEntry) -> bool {
             }
         } else if file_type.is_file() {
             entry.metadata().map(|m| m.len() == 0).unwrap_or(false)
+        } else if file_type.is_symlink() {
+            if let Ok(target) = entry.path().read_link() {
+                let full_target = entry.path().parent().unwrap_or(Path::new("/")).join(target);
+                !full_target.exists()
+            } else {
+                false
+            }
         } else {
             false
         }
