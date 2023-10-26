@@ -19,11 +19,12 @@ mod walk;
 
 use std::env;
 use std::io::IsTerminal;
-use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::{Context, Result, anyhow, bail};
-use clap::{CommandFactory, Parser};
+#[cfg(feature = "completions")]
+use clap::CommandFactory;
+use clap::Parser;
 use globset::GlobBuilder;
 use lscolors::LsColors;
 use regex::bytes::{Regex, RegexBuilder, RegexSetBuilder};
@@ -71,7 +72,7 @@ fn main() {
         Err(err) => {
             // NB: we use eprintln directly instead of print_error!() because
             // we sanitize anyhow errors at the generation site
-            eprintln!("[fd error]: {:#}", err);
+            eprintln!("[fd error]: {err:#}");
             ExitCode::GeneralError.exit();
         }
     }
@@ -123,7 +124,7 @@ fn print_completions(shell: clap_complete::Shell) -> Result<ExitCode> {
     let first_arg = env::args().next();
     let program_name = first_arg
         .as_ref()
-        .map(Path::new)
+        .map(std::path::Path::new)
         .and_then(|path| path.file_stem())
         .and_then(|file| file.to_str())
         .unwrap_or("fd");
@@ -212,8 +213,7 @@ fn ensure_single_search_pattern_is_not_a_path(pattern: &str) -> Result<()> {
              If you want to search for all files inside the '{pattern}' directory, use a match-all pattern:\n\n  \
              fd . '{pattern}'\n\n\
              Instead, if you want your pattern to match the full file path, use:\n\n  \
-             fd --full-path '{pattern}'",
-            pattern = pattern,
+             fd --full-path '{pattern}'"
         ))
     } else {
         Ok(())
@@ -487,8 +487,7 @@ fn extract_time_constraints(opts: &Opts) -> Result<Vec<TimeFilter>> {
             time_constraints.push(f);
         } else {
             return Err(anyhow!(
-                "'{}' is not a valid date or duration. See 'fd --help'.",
-                t
+                "'{t}' is not a valid date or duration. See 'fd --help'."
             ));
         }
     }
@@ -497,8 +496,7 @@ fn extract_time_constraints(opts: &Opts) -> Result<Vec<TimeFilter>> {
             time_constraints.push(f);
         } else {
             return Err(anyhow!(
-                "'{}' is not a valid date or duration. See 'fd --help'.",
-                t
+                "'{t}' is not a valid date or duration. See 'fd --help'."
             ));
         }
     }
@@ -532,11 +530,10 @@ fn build_regex(pattern_regex: String, config: &Config) -> Result<regex::bytes::R
         .build()
         .map_err(|e| {
             anyhow!(
-                "{}\n\nNote: You can search for literal substrings with '--fixed-strings' \
+                "{e}\n\nNote: You can search for literal substrings with '--fixed-strings' \
                  or literal strings with '--exact' options (instead of a regular expression). \
                  Alternatively, you can \
-                 also use the '--glob' option to match on a glob pattern.",
-                e
+                 also use the '--glob' option to match on a glob pattern."
             )
         })
 }

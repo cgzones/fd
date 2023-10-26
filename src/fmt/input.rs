@@ -20,15 +20,16 @@ pub fn remove_extension(path: &Path) -> OsString {
 
 /// Removes the basename from the path.
 pub fn dirname(path: &Path) -> OsString {
-    path.parent()
-        .map(|p| {
+    path.parent().map_or_else(
+        || path.as_os_str().to_owned(),
+        |p| {
             if p == OsStr::new("") {
                 OsString::from(".")
             } else {
                 p.as_os_str().to_owned()
             }
-        })
-        .unwrap_or_else(|| path.as_os_str().to_owned())
+        },
+    )
 }
 
 #[cfg(test)]

@@ -102,7 +102,7 @@ impl FormatTemplate {
         if !buf.is_empty() {
             tokens.push(Token::Text(buf));
         }
-        debug_assert!(!tokens.is_empty());
+        debug_assert_ne!(tokens, [] as [Token; 0]);
         Self::Tokens(tokens)
     }
 
@@ -110,7 +110,7 @@ impl FormatTemplate {
     /// the path separator in all placeholder tokens. Fixed text and tokens are not affected by
     /// path separator substitution.
     pub fn generate(&self, path: impl AsRef<Path>, path_separator: Option<&str>) -> OsString {
-        use Token::*;
+        use Token::{Basename, BasenameNoExt, NoExt, Parent, Placeholder, Text};
         let path = path.as_ref();
 
         match *self {
@@ -129,7 +129,7 @@ impl FormatTemplate {
                         )),
                         Parent => s.push(Self::replace_separator(&dirname(path), path_separator)),
                         Placeholder => {
-                            s.push(Self::replace_separator(path.as_ref(), path_separator))
+                            s.push(Self::replace_separator(path.as_ref(), path_separator));
                         }
                         Text(string) => s.push(string),
                     }
@@ -199,7 +199,7 @@ impl FormatTemplate {
 // Convert the id from an aho-corasick match to the
 // appropriate token
 fn token_from_pattern_id(id: u32) -> Token {
-    use Token::*;
+    use Token::{Basename, BasenameNoExt, NoExt, Parent, Placeholder};
     match id {
         2 => Placeholder,
         3 => Basename,

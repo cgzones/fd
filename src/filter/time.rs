@@ -22,7 +22,7 @@ thread_local! {
 /// This allows us to set a specific time when running tests
 #[cfg(test)]
 fn now() -> Zoned {
-    TESTTIME.with_borrow(|reftime| reftime.as_ref().cloned().unwrap_or_else(Zoned::now))
+    TESTTIME.with_borrow(|reftime| reftime.clone().unwrap_or_else(Zoned::now))
 }
 
 impl TimeFilter {

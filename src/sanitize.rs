@@ -51,7 +51,7 @@ pub(crate) struct SanitizedStr<'a> {
     is_safe: bool,
 }
 
-impl<'a> Display for SanitizedStr<'a> {
+impl Display for SanitizedStr<'_> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         if self.is_safe {
             // We don't need to sanitize anything, just forward

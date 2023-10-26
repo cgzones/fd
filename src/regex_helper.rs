@@ -7,8 +7,7 @@ pub fn pattern_has_uppercase_char(pattern: &str) -> bool {
     // Smart case must consider the original literals, before case folding.
     regex_syntax::ast::parse::Parser::new()
         .parse(pattern)
-        .map(|ast| regex_syntax::ast::visit(&ast, UppercaseVisitor(false)).unwrap_or(false))
-        .unwrap_or(false)
+        .is_ok_and(|ast| regex_syntax::ast::visit(&ast, UppercaseVisitor(false)).unwrap_or(false))
 }
 
 struct UppercaseVisitor(bool);
@@ -51,13 +50,12 @@ pub fn pattern_matches_strings_with_leading_dot(pattern: &str) -> bool {
 
     parser
         .parse(pattern)
-        .map(|hir| hir_matches_strings_with_leading_dot(&hir))
-        .unwrap_or(false)
+        .is_ok_and(|hir| hir_matches_strings_with_leading_dot(&hir))
 }
 
 /// See above.
 fn hir_matches_strings_with_leading_dot(hir: &Hir) -> bool {
-    use regex_syntax::hir::*;
+    use regex_syntax::hir::{HirKind, Literal, Look};
 
     // Note: this only really detects the simplest case where a regex starts with
     // "^\\.", i.e. a start text anchor and a literal dot character. There are a lot
