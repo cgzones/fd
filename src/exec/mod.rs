@@ -289,7 +289,7 @@ impl ArgumentTemplate {
         matches!(self, ArgumentTemplate::Tokens(_))
     }
 
-    /// Generate an argument from this template. If path_separator is Some, then it will replace
+    /// Generate an argument from this template. If `path_separator` is Some, then it will replace
     /// the path separator in all placeholder tokens. Text arguments and tokens are not affected by
     /// path separator substitution.
     pub fn generate(&self, path: impl AsRef<Path>, path_separator: Option<&str>) -> OsString {
@@ -312,7 +312,7 @@ impl ArgumentTemplate {
                         )),
                         Parent => s.push(Self::replace_separator(&dirname(path), path_separator)),
                         Placeholder => {
-                            s.push(Self::replace_separator(path.as_ref(), path_separator))
+                            s.push(Self::replace_separator(path.as_ref(), path_separator));
                         }
                         Text(ref string) => s.push(string),
                     }
@@ -323,10 +323,11 @@ impl ArgumentTemplate {
         }
     }
 
-    /// Replace the path separator in the input with the custom separator string. If path_separator
+    /// Replace the path separator in the input with the custom separator string. If
+    /// `path_separator`
     /// is None, simply return a borrowed Cow<OsStr> of the input. Otherwise, the input is
     /// interpreted as a Path and its components are iterated through and re-joined into a new
-    /// OsString.
+    /// `OsString`.
     fn replace_separator<'a>(path: &'a OsStr, path_separator: Option<&str>) -> Cow<'a, OsStr> {
         // fast-path - no replacement necessary
         if path_separator.is_none() {

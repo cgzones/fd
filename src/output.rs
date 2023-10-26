@@ -25,7 +25,7 @@ pub fn print_entry<W: Write>(stdout: &mut W, entry: &DirEntry, config: &Config) 
             // Exit gracefully in case of a broken pipe (e.g. 'fd ... | head -n 3').
             ExitCode::Success.exit();
         } else {
-            print_error(format!("Could not write to output: {}", e));
+            print_error(format!("Could not write to output: {e}"));
             ExitCode::GeneralError.exit();
         }
     }
@@ -125,9 +125,9 @@ fn print_entry_uncolorized_base<W: Write>(
     if let Some(ref separator) = config.path_separator {
         *path_string.to_mut() = replace_path_separator(&path_string, separator);
     }
-    write!(stdout, "{}", path_string)?;
+    write!(stdout, "{path_string}")?;
     print_trailing_slash(stdout, entry, config, None)?;
-    write!(stdout, "{}", separator)
+    write!(stdout, "{separator}")
 }
 
 #[cfg(not(unix))]

@@ -43,7 +43,7 @@ impl<'a> OutputBuffer<'a> {
         let mut stdout = stdout.lock();
         let mut stderr = stderr.lock();
 
-        for output in self.outputs.iter() {
+        for output in &self.outputs {
             let _ = stdout.write_all(&output.stdout);
             let _ = stderr.write_all(&output.stderr);
         }
@@ -103,7 +103,7 @@ pub fn handle_cmd_error(cmd: Option<&Command>, err: io::Error) -> ExitCode {
             ExitCode::GeneralError
         }
         (_, err) => {
-            print_error(format!("Problem while executing command: {}", err));
+            print_error(format!("Problem while executing command: {err}"));
             ExitCode::GeneralError
         }
     }
