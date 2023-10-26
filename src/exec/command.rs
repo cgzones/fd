@@ -44,7 +44,7 @@ impl OutputBuffer {
         let mut stdout = stdout.lock();
         let mut stderr = stderr.lock();
 
-        for output in self.outputs.iter() {
+        for output in &self.outputs {
             let _ = stdout.write_all(&output.stdout);
             let _ = stderr.write_all(&output.stderr);
         }

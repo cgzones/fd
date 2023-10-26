@@ -2112,7 +2112,7 @@ fn test_quiet() {
     te.assert_output(&["-q"], "");
     te.assert_output(&["--quiet"], "");
     te.assert_output(&["--has-results"], "");
-    te.assert_failure_with_error(&["--quiet", "c.foo"], "")
+    te.assert_failure_with_error(&["--quiet", "c.foo"], "");
 }
 
 /// Literal search (--fixed-strings)
@@ -2631,9 +2631,7 @@ fn test_invalid_cwd() {
         .output()
         .unwrap();
 
-    if !output.status.success() {
-        panic!("{output:?}");
-    }
+    assert!(output.status.success(), "{output:?}")
 }
 
 /// Test behavior of .git directory with various flags

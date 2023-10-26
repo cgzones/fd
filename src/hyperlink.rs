@@ -14,7 +14,7 @@ impl fmt::Display for PathUrl {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         write!(f, "file://{}", host())?;
         let bytes = self.0.as_os_str().as_encoded_bytes();
-        for &byte in bytes.iter() {
+        for &byte in bytes {
             encode(f, byte)?;
         }
         Ok(())
