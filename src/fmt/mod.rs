@@ -129,7 +129,7 @@ impl FormatTemplate {
                         )),
                         Parent => s.push(Self::replace_separator(&dirname(path), path_separator)),
                         Placeholder => {
-                            s.push(Self::replace_separator(path.as_ref(), path_separator))
+                            s.push(Self::replace_separator(path.as_ref(), path_separator));
                         }
                         Text(ref string) => s.push(string),
                     }

@@ -36,7 +36,7 @@ enum ReceiverMode {
     Streaming,
 }
 
-/// The Worker threads can result in a valid entry having PathBuf or an error.
+/// The Worker threads can result in a valid entry having `PathBuf` or an error.
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum WorkerResult {
@@ -488,14 +488,14 @@ impl WorkerState {
                                 path,
                                 err: inner_err,
                             })) {
-                                Ok(_) => WalkState::Continue,
+                                Ok(()) => WalkState::Continue,
                                 Err(_) => WalkState::Quit,
                             }
                         }
                     },
                     Err(err) => {
                         return match tx.send(WorkerResult::Error(err)) {
-                            Ok(_) => WalkState::Continue,
+                            Ok(()) => WalkState::Continue,
                             Err(_) => WalkState::Quit,
                         }
                     }
