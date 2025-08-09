@@ -10,8 +10,8 @@ use std::sync::{Arc, Mutex, MutexGuard};
 use std::thread;
 use std::time::{Duration, Instant};
 
-use anyhow::{anyhow, Result};
-use crossbeam_channel::{bounded, Receiver, RecvTimeoutError, SendError, Sender};
+use anyhow::{Result, anyhow};
+use crossbeam_channel::{Receiver, RecvTimeoutError, SendError, Sender, bounded};
 use etcetera::BaseStrategy;
 use ignore::overrides::{Override, OverrideBuilder};
 use ignore::{WalkBuilder, WalkParallel, WalkState};
@@ -21,7 +21,7 @@ use crate::config::Config;
 use crate::dir_entry::DirEntry;
 use crate::error::print_error;
 use crate::exec;
-use crate::exit_codes::{merge_exitcodes, ExitCode};
+use crate::exit_codes::{ExitCode, merge_exitcodes};
 use crate::filesystem;
 use crate::output;
 
@@ -490,14 +490,14 @@ impl WorkerState {
                             })) {
                                 Ok(()) => WalkState::Continue,
                                 Err(_) => WalkState::Quit,
-                            }
+                            };
                         }
                     },
                     Err(err) => {
                         return match tx.send(WorkerResult::Error(err)) {
                             Ok(()) => WalkState::Continue,
                             Err(_) => WalkState::Quit,
-                        }
+                        };
                     }
                 };
 

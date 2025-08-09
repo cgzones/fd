@@ -5,7 +5,7 @@ use std::fs;
 use std::io;
 #[cfg(any(unix, target_os = "redox"))]
 use std::os::unix::fs::FileTypeExt;
-use std::path::{Path, PathBuf, MAIN_SEPARATOR_STR};
+use std::path::{MAIN_SEPARATOR_STR, Path, PathBuf};
 
 use normpath::PathExt;
 
@@ -111,7 +111,7 @@ pub fn is_pipe(_: fs::FileType) -> bool {
 }
 
 #[cfg(any(unix, target_os = "redox"))]
-pub fn osstr_to_bytes(input: &OsStr) -> Cow<[u8]> {
+pub fn osstr_to_bytes(input: &OsStr) -> Cow<'_, [u8]> {
     use std::os::unix::ffi::OsStrExt;
     Cow::Borrowed(input.as_bytes())
 }
