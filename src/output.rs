@@ -28,7 +28,7 @@ pub fn print_entry<W: Write>(stdout: &mut W, entry: &DirEntry, config: &Config) 
         print_entry_colorized(stdout, entry, config, ls_colors)?;
     } else {
         print_entry_uncolorized(stdout, entry, config)?;
-    };
+    }
 
     if has_hyperlink {
         write!(stdout, "\x1B]8;;\x1B\\")?;

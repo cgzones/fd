@@ -110,7 +110,7 @@ impl FormatTemplate {
     /// the path separator in all placeholder tokens. Fixed text and tokens are not affected by
     /// path separator substitution.
     pub fn generate(&self, path: impl AsRef<Path>, path_separator: Option<&str>) -> OsString {
-        use Token::*;
+        use Token::{Basename, BasenameNoExt, NoExt, Parent, Placeholder, Text};
         let path = path.as_ref();
 
         match *self {
@@ -199,7 +199,7 @@ impl FormatTemplate {
 // Convert the id from an aho-corasick match to the
 // appropriate token
 fn token_from_pattern_id(id: u32) -> Token {
-    use Token::*;
+    use Token::{Basename, BasenameNoExt, NoExt, Parent, Placeholder};
     match id {
         2 => Placeholder,
         3 => Basename,

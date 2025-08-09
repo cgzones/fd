@@ -13,7 +13,7 @@ pub fn pattern_has_uppercase_char(pattern: &str) -> bool {
 
 /// Determine if a regex expression contains a literal uppercase character.
 fn hir_has_uppercase_char(hir: &Hir) -> bool {
-    use regex_syntax::hir::*;
+    use regex_syntax::hir::{Capture, Class, HirKind, Literal, Repetition};
 
     match hir.kind() {
         HirKind::Literal(Literal(bytes)) => match std::str::from_utf8(bytes) {
@@ -48,7 +48,7 @@ pub fn pattern_matches_strings_with_leading_dot(pattern: &str) -> bool {
 
 /// See above.
 fn hir_matches_strings_with_leading_dot(hir: &Hir) -> bool {
-    use regex_syntax::hir::*;
+    use regex_syntax::hir::{HirKind, Literal, Look};
 
     // Note: this only really detects the simplest case where a regex starts with
     // "^\\.", i.e. a start text anchor and a literal dot character. There are a lot

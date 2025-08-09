@@ -138,8 +138,7 @@ impl Colorable for DirEntry {
                 // Copied from LsColors::style_for_path_with_metadata().
                 path.components()
                     .next_back()
-                    .map(|c| c.as_os_str())
-                    .unwrap_or_else(|| path.as_os_str())
+                    .map_or_else(|| path.as_os_str(), |c| c.as_os_str())
             }
         };
         name.to_owned()

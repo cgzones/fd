@@ -30,8 +30,7 @@ impl OwnerFilter {
 
         if it.next().is_some() {
             return Err(anyhow!(
-                "more than one ':' present in owner string '{}'. See 'fd --help'.",
-                input
+                "more than one ':' present in owner string '{input}'. See 'fd --help'."
             ));
         }
 
@@ -41,7 +40,7 @@ impl OwnerFilter {
             } else {
                 User::from_name(s)?
                     .map(|user| user.uid.as_raw())
-                    .ok_or_else(|| anyhow!("'{}' is not a recognized user name", s))
+                    .ok_or_else(|| anyhow!("'{s}' is not a recognized user name"))
             }
         })?;
         let gid = Check::parse(snd, |s| {
@@ -50,7 +49,7 @@ impl OwnerFilter {
             } else {
                 Group::from_name(s)?
                     .map(|group| group.gid.as_raw())
-                    .ok_or_else(|| anyhow!("'{}' is not a recognized group name", s))
+                    .ok_or_else(|| anyhow!("'{s}' is not a recognized group name"))
             }
         })?;
 

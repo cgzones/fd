@@ -773,7 +773,7 @@ impl Opts {
     }
 
     pub fn strip_cwd_prefix<P: FnOnce() -> bool>(&self, auto_pred: P) -> bool {
-        use self::StripCwdWhen::*;
+        use self::StripCwdWhen::{Always, Auto, Never};
         self.no_search_paths()
             && match self.strip_cwd_prefix.map_or(Auto, |o| o.unwrap_or(Always)) {
                 Auto => auto_pred(),

@@ -27,7 +27,7 @@ const TEBI: u64 = GIBI * 1024;
 impl SizeFilter {
     pub fn from_string(s: &str) -> anyhow::Result<Self> {
         SizeFilter::parse_opt(s)
-            .ok_or_else(|| anyhow!("'{}' is not a valid size constraint. See 'fd --help'.", s))
+            .ok_or_else(|| anyhow!("'{s}' is not a valid size constraint. See 'fd --help'."))
     }
 
     fn parse_opt(s: &str) -> Option<Self> {

@@ -338,7 +338,7 @@ impl WorkerState {
         for pattern in &config.exclude_patterns {
             builder
                 .add(pattern)
-                .map_err(|e| anyhow!("Malformed exclude pattern: {}", e))?;
+                .map_err(|e| anyhow!("Malformed exclude pattern: {e}"))?;
         }
 
         builder
@@ -377,11 +377,10 @@ impl WorkerState {
             if global_ignore_file.is_file() {
                 let result = builder.add_ignore(global_ignore_file);
                 match result {
-                    Some(ignore::Error::Partial(_)) => (),
+                    Some(ignore::Error::Partial(_)) | None => (),
                     Some(err) => {
                         print_error(format!("Malformed pattern in global ignore file. {err}."));
                     }
-                    None => (),
                 }
             }
         }
@@ -389,11 +388,10 @@ impl WorkerState {
         for ignore_file in &config.ignore_files {
             let result = builder.add_ignore(ignore_file);
             match result {
-                Some(ignore::Error::Partial(_)) => (),
+                Some(ignore::Error::Partial(_)) | None => (),
                 Some(err) => {
                     print_error(format!("Malformed pattern in custom ignore file. {err}."));
                 }
-                None => (),
             }
         }
 
@@ -590,10 +588,10 @@ impl WorkerState {
                         }
                     }
 
-                    if let Some(context_constraint) = &config.context_constraint {
-                        if !context_constraint.matches(entry_path) {
-                            return ignore::WalkState::Continue;
-                        }
+                    if let Some(context_constraint) = &config.context_constraint
+                        && !context_constraint.matches(entry_path)
+                    {
+                        return ignore::WalkState::Continue;
                     }
                 }
 

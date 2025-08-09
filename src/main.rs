@@ -19,7 +19,9 @@ use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::{Context, Result, anyhow, bail};
-use clap::{CommandFactory, Parser};
+use clap::Parser;
+#[cfg(feature = "completions")]
+use clap::CommandFactory;
 use globset::GlobBuilder;
 use lscolors::LsColors;
 use regex::bytes::{Regex, RegexBuilder, RegexSetBuilder};
@@ -271,7 +273,9 @@ fn construct_config(mut opts: Opts, pattern_regexps: &[String]) -> Result<Config
         hyperlink,
         interactive_terminal,
         file_types: opts.filetype.as_ref().map(|values| {
-            use crate::cli::FileType::*;
+            use crate::cli::FileType::{
+                BlockDevice, CharDevice, Directory, Empty, Executable, File, Pipe, Socket, Symlink,
+            };
             let mut file_types = FileTypes::default();
             for value in values {
                 match value {
@@ -374,16 +378,13 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
         ]
     };
     let cmd: Vec<&str> = if cfg!(unix) {
-        if !cfg!(any(
+        if cfg!(any(
             target_os = "macos",
             target_os = "dragonfly",
             target_os = "freebsd",
             target_os = "netbsd",
             target_os = "openbsd"
         )) {
-            // Assume ls is GNU ls
-            gnu_ls("ls")
-        } else {
             // MacOS, DragonFlyBSD, FreeBSD
             use std::process::{Command, Stdio};
 
@@ -412,6 +413,9 @@ fn determine_ls_command(colored_output: bool) -> Result<Vec<&'static str>> {
 
                 cmd
             }
+        } else {
+            // Assume ls is GNU ls
+            gnu_ls("ls")
         }
     } else if cfg!(windows) {
         use std::process::{Command, Stdio};
@@ -446,8 +450,7 @@ fn extract_time_constraints(opts: &Opts) -> Result<Vec<TimeFilter>> {
             time_constraints.push(f);
         } else {
             return Err(anyhow!(
-                "'{}' is not a valid date or duration. See 'fd --help'.",
-                t
+                "'{t}' is not a valid date or duration. See 'fd --help'."
             ));
         }
     }
@@ -456,8 +459,7 @@ fn extract_time_constraints(opts: &Opts) -> Result<Vec<TimeFilter>> {
             time_constraints.push(f);
         } else {
             return Err(anyhow!(
-                "'{}' is not a valid date or duration. See 'fd --help'.",
-                t
+                "'{t}' is not a valid date or duration. See 'fd --help'."
             ));
         }
     }
@@ -491,10 +493,9 @@ fn build_regex(pattern_regex: String, config: &Config) -> Result<regex::bytes::R
         .build()
         .map_err(|e| {
             anyhow!(
-                "{}\n\nNote: You can use the '--fixed-strings' option to search for a \
+                "{e}\n\nNote: You can use the '--fixed-strings' option to search for a \
                  literal string instead of a regular expression. Alternatively, you can \
-                 also use the '--glob' option to match on a glob pattern.",
-                e
+                 also use the '--glob' option to match on a glob pattern."
             )
         })
 }
