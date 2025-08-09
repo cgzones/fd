@@ -220,10 +220,10 @@ impl<'a, W: Write> ReceiverBuffer<'a, W> {
                             }
 
                             self.num_results += 1;
-                            if let Some(max_results) = self.config.max_results {
-                                if self.num_results >= max_results {
-                                    return self.stop();
-                                }
+                            if let Some(max_results) = self.config.max_results
+                                && self.num_results >= max_results
+                            {
+                                return self.stop();
                             }
                         }
                         WorkerResult::Error(err) => {
@@ -252,11 +252,11 @@ impl<'a, W: Write> ReceiverBuffer<'a, W> {
 
     /// Output a path.
     fn print(&mut self, entry: &DirEntry) -> Result<(), ExitCode> {
-        if let Err(e) = output::print_entry(&mut self.stdout, entry, self.config) {
-            if e.kind() != ::std::io::ErrorKind::BrokenPipe {
-                print_error(format!("Could not write to output: {e}"));
-                return Err(ExitCode::GeneralError);
-            }
+        if let Err(e) = output::print_entry(&mut self.stdout, entry, self.config)
+            && e.kind() != ::std::io::ErrorKind::BrokenPipe
+        {
+            print_error(format!("Could not write to output: {e}"));
+            return Err(ExitCode::GeneralError);
         }
 
         if self.interrupt_flag.load(Ordering::Relaxed) {
@@ -370,18 +370,18 @@ impl WorkerState {
             builder.add_custom_ignore_filename(".fdignore");
         }
 
-        if config.read_global_ignore {
-            if let Ok(basedirs) = etcetera::choose_base_strategy() {
-                let global_ignore_file = basedirs.config_dir().join("fd").join("ignore");
-                if global_ignore_file.is_file() {
-                    let result = builder.add_ignore(global_ignore_file);
-                    match result {
-                        Some(ignore::Error::Partial(_)) => (),
-                        Some(err) => {
-                            print_error(format!("Malformed pattern in global ignore file. {err}."));
-                        }
-                        None => (),
+        if config.read_global_ignore
+            && let Ok(basedirs) = etcetera::choose_base_strategy()
+        {
+            let global_ignore_file = basedirs.config_dir().join("fd").join("ignore");
+            if global_ignore_file.is_file() {
+                let result = builder.add_ignore(global_ignore_file);
+                match result {
+                    Some(ignore::Error::Partial(_)) => (),
+                    Some(err) => {
+                        print_error(format!("Malformed pattern in global ignore file. {err}."));
                     }
+                    None => (),
                 }
             }
         }
@@ -451,11 +451,12 @@ impl WorkerState {
             let quit_flag = self.quit_flag.as_ref();
 
             let mut limit = 0x100;
-            if let Some(cmd) = &config.command {
-                if !cmd.in_batch_mode() && config.threads > 1 {
-                    // Evenly distribute work between multiple receivers
-                    limit = 1;
-                }
+            if let Some(cmd) = &config.command
+                && !cmd.in_batch_mode()
+                && config.threads > 1
+            {
+                // Evenly distribute work between multiple receivers
+                limit = 1;
             }
             let mut tx = BatchSender::new(tx.clone(), limit);
 
@@ -501,10 +502,10 @@ impl WorkerState {
                     }
                 };
 
-                if let Some(min_depth) = config.min_depth {
-                    if entry.depth().map_or(true, |d| d < min_depth) {
-                        return WalkState::Continue;
-                    }
+                if let Some(min_depth) = config.min_depth
+                    && entry.depth().is_none_or(|d| d < min_depth)
+                {
+                    return WalkState::Continue;
                 }
 
                 // Check the name first, since it doesn't require metadata
@@ -544,10 +545,10 @@ impl WorkerState {
                 }
 
                 // Filter out unwanted file types.
-                if let Some(ref file_types) = config.file_types {
-                    if file_types.should_ignore(&entry) {
-                        return WalkState::Continue;
-                    }
+                if let Some(ref file_types) = config.file_types
+                    && file_types.should_ignore(&entry)
+                {
+                    return WalkState::Continue;
                 }
 
                 // Filter out unwanted inode numbers.
@@ -574,10 +575,10 @@ impl WorkerState {
                         }
                     }
 
-                    if let Some(context_constraint) = &config.context_constraint {
-                        if !context_constraint.matches(entry_path) {
-                            return ignore::WalkState::Continue;
-                        }
+                    if let Some(context_constraint) = &config.context_constraint
+                        && !context_constraint.matches(entry_path)
+                    {
+                        return ignore::WalkState::Continue;
                     }
                 }
 
@@ -604,24 +605,24 @@ impl WorkerState {
                 // Filter out unwanted modification times
                 if !config.time_constraints.is_empty() {
                     let mut matched = false;
-                    if let Some(metadata) = entry.metadata() {
-                        if let Ok(modified) = metadata.modified() {
-                            matched = config
-                                .time_constraints
-                                .iter()
-                                .all(|tf| tf.applies_to(&modified));
-                        }
+                    if let Some(metadata) = entry.metadata()
+                        && let Ok(modified) = metadata.modified()
+                    {
+                        matched = config
+                            .time_constraints
+                            .iter()
+                            .all(|tf| tf.applies_to(&modified));
                     }
                     if !matched {
                         return WalkState::Continue;
                     }
                 }
 
-                if config.is_printing() {
-                    if let Some(ls_colors) = &config.ls_colors {
-                        // Compute colors in parallel
-                        entry.style(ls_colors);
-                    }
+                if config.is_printing()
+                    && let Some(ls_colors) = &config.ls_colors
+                {
+                    // Compute colors in parallel
+                    entry.style(ls_colors);
                 }
 
                 let send_result = tx.send(WorkerResult::Entry(entry));
