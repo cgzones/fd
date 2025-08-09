@@ -5,7 +5,7 @@ use std::fs;
 use std::io;
 #[cfg(any(unix, target_os = "redox"))]
 use std::os::unix::fs::FileTypeExt;
-use std::path::{Path, PathBuf, MAIN_SEPARATOR_STR};
+use std::path::{MAIN_SEPARATOR_STR, Path, PathBuf};
 
 use normpath::PathExt;
 
