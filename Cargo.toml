@@ -96,7 +96,7 @@ panic = "abort"
 use-jemalloc = ["tikv-jemallocator"]
 completions = ["clap_complete"]
 base = ["use-jemalloc"]
-default = ["use-jemalloc", "completions"]
+default = ["use-jemalloc"]
 
 [package.metadata.binstall]
 pkg-url = "{ repo }/releases/download/v{ version }/{ name }-v{ version }-{ target }.{ archive-format }"

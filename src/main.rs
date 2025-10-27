@@ -19,9 +19,9 @@ use std::path::Path;
 use std::sync::Arc;
 
 use anyhow::{Context, Result, anyhow, bail};
-use clap::Parser;
 #[cfg(feature = "completions")]
 use clap::CommandFactory;
+use clap::Parser;
 use globset::GlobBuilder;
 use lscolors::LsColors;
 use regex::bytes::{Regex, RegexBuilder, RegexSetBuilder};
